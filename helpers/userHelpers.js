@@ -528,12 +528,20 @@ module.exports = {
     },
     getfeaturedCat:()=>{
       return new Promise(async (resolve,reject)=>{
-        const FeaturedCat = await productData.find({}).lean().populate('subCategory').limit(4)
+        const FeaturedCat = await productData.find({productType:"Featured Product"})
+        .lean().populate('subCategory').limit(4)
         console.log('77777 7');
         console.log(FeaturedCat);
         resolve(FeaturedCat)
     })
   },
+  getAllCarosel:()=>{
+    return new Promise(async (resolve,reject)=>{
+      const carosel = await productData.find({carosel:"Yes"}).lean().limit(4)
+      resolve(carosel)
+  })
+},
+
   getWishItems: (userId) => {   
     return new Promise(async (resolve, reject) => {
      let wishItem = await wishlist

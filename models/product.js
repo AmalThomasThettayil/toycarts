@@ -28,7 +28,12 @@ const productSchema = new Schema({
     productType:{
         type:String,
         default:'New Arrival'
+    },
+    carosel:{
+        type:String,
+        default:'No'
     }
+
     
 })
 const product=mongoose.model('product',productSchema)

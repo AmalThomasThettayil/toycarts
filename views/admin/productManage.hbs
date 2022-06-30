@@ -257,8 +257,7 @@
                             <th>Stock</th>
                             <th>Image</th>
                             <th>Options</th>
-                           
-
+                            <th>Carosel</th>
                         </tr>
                     </thead>
                     <tbody id="myTable">
@@ -274,23 +273,32 @@
                             <td> <a href="/admin/editProduct/{{this._id}}" class="btn btn-primary  mb-1"><i
                                         class="fa-solid fa-scissors"></i></a>
                                 <a href="/admin/deleteProduct/{{this._id}}" class="delete-button btn btn-danger  mb-1">
-                                <i class="fa-solid fa-trash"></i>
-                                </a>
-
+                                    <i class="fa-solid fa-trash"></i></a>
                                 <form action="/admin/changeProductType" id="changeType" method="post">
                                     <input type="text" value="{{this._id}}" name="proId" hidden>
-                                  <select class="form-select form-select-sm mb-1" name="productType"
-                                    aria-label=".form-select-sm example" required>
-                                    <option selected>{{this.productType}}</option>
-                                    <option value="Featured Product" >Featured Product</option>
-                                    <option value="Most Selling" >Most Selling</option>
-                                    <option value="New Arrival" >New Arrival</option>
-                                    <option value="Deal of the Day" >Deal of the Day</option>
-                                </select>
-                                <button class=" btn btn-warning" type="submit">Change</button>
+                                    <select class="form-select form-select-sm mb-1" name="productType"
+                                        aria-label=".form-select-sm example" required>
+                                        <option selected>{{this.productType}}</option>
+                                        <option value="Featured Product">Featured Product</option>
+                                        <option value="Most Selling">Most Selling</option>
+                                        <option value="New Arrival">New Arrival</option>
+                                        <option value="Deal of the Day">Deal of the Day</option>
+                                    </select>
+                                    <button class=" btn btn-warning" type="submit">Change</button>
                                 </form>
                             </td>
-                          
+                            <td>
+                                <form action="/admin/changeCarosel" id="changeType" method="post">
+                                    <input type="text" value="{{this._id}}" name="proId" hidden>
+                                    <select class="form-select form-select-sm mb-1" name="carosel"
+                                        aria-label=".form-select-sm example" required>
+                                        <option selected>{{this.carosel}}</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>                                        
+                                    </select>
+                                    <button class=" btn btn-warning" type="submit">Change</button>
+                                </form>
+                            </td>
                         </tr>
                         {{/each}}
                     </tbody>

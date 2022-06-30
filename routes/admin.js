@@ -228,6 +228,12 @@ router.post('/changeProductType',(req,res)=>{
     res.redirect('/admin/productManage')
   })
 })
+router.post('/changeCarosel',(req,res)=>{
+  console.log('inside change carosel')
+  adminHelpers.changeCarosel(req.body).then((response)=>{
+    res.redirect('/admin/productManage')
+  })
+})
 
 
 module.exports = router;

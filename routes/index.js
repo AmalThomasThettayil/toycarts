@@ -26,11 +26,12 @@ router.get("/", async function (req, res, next) {
     ]);
   }
 
-  [mostSelling, featuredCat, category, allProducts] = await Promise.all([
+  [mostSelling, featuredCat, category, allProducts,carosel] = await Promise.all([
     userHelpers.getMostSell(),
     userHelpers.getfeaturedCat(),
     adminHelpers.getAllCategory(),
     adminHelpers.getAllProducts(),
+    userHelpers.getAllCarosel()
   ]);
   res.render("user/home new", {
     category,
@@ -40,6 +41,7 @@ router.get("/", async function (req, res, next) {
     mostSelling,
     featuredCat,
     wishCount,
+    carosel
   });
 });
 
@@ -211,9 +213,6 @@ router.post("/RPass", async (req, res) => {
 router.get("/uLogin", function (req, res, next) {
   res.render("user/uLogin", { layout: false });
 });
-router.get("/shop", function (req, res, next) {
-  res.render("user/shop", { layout: false });
-});
 
 router.get("/cartNew", verifyLogin, async function (req, res, next) { 
   let user = req.session.user;
@@ -320,14 +319,23 @@ router.get("/productDetails/:id", async (req, res) => {
 });
 
 router.get("/checkout", async (req, res) => {
-  let user = req.session.user;
+  const user = req.session.user;
+  let cartCount = null;
+  let wishCount = null;
+  if (user) {
+    [cartCount, wishCount] = await Promise.all([
+      userHelpers.getCartCount(user),
+      userHelpers.getWishCount(user),
+    ]);
+  }
+  
   const cartItems = await userHelpers.getCartItems(req.session.user._id);
   const subTotal = await userHelpers.subTotal(req.session.user._id);
   const totalAmount = await userHelpers.totalAmount(req.session.user._id);
   const netTotal = totalAmount.grandTotal.total;
   const deliveryCharge = await userHelpers.deliveryCharge(netTotal);
   const grandTotal = await userHelpers.grandTotal(netTotal, deliveryCharge);
-
+  const category = await adminHelpers.getAllCategory()
   res.render("user/checkout", {
     netTotal,
     deliveryCharge,
@@ -335,7 +343,9 @@ router.get("/checkout", async (req, res) => {
     subTotal,
     user,
     cartItems,
-    layout: false,
+    cartCount,
+    wishCount,
+    category
   });
 });
 router.post("/placeOrder", async (req, res) => {
@@ -449,6 +459,13 @@ router.delete("/ProductFromWish", (req, res, next) => {
     res.json({ status: true });
   });
 });
+
+router.get("/shop",(req,res)=>{
+  const allProducts = adminHelpers.getAllProducts()
+  res.render("user/category",{allProducts})
+})
+
+
 
 // router.get("/product-details/:id", async (req, res) => {
 //   let product = await userHelper.getproductdetalis(req.params.id);

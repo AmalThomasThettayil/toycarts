@@ -222,4 +222,18 @@ changeProductType:(data) =>{
       })
   })
 },
+changeCarosel:(data) =>{
+  return new Promise(async (resolve,reject)=>{
+      await productData.findByIdAndUpdate(
+          { _id: data.proId },
+          { $set: { carosel: data.carosel } }
+      ).then((response)=>{          
+          resolve(response)
+      }).catch((err)=>{
+          console.log(err)
+      })
+  })
+},
+
+
 }
