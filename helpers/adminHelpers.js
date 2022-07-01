@@ -4,6 +4,8 @@ const category = require("../models/categories");
 const subcategory = require("../models/subcategories");
 const productData=require('../models/product');
 const orderModel = require('../models/order')
+const adminData=require('../models/admin');
+const bcrypt = require("bcrypt");
 
 module.exports = {
   getAllUsers: () => {
@@ -233,6 +235,28 @@ changeCarosel:(data) =>{
           console.log(err)
       })
   })
+},
+doAdminLogin: (data) => {
+  return new Promise(async (resolve, reject) => {
+    let response = {};
+    const admin = await adminData.findOne({ email: data.email });
+    if (admin) {      
+      bcrypt.compare(data.password, admin.password).then((status) => {
+        if (status) {
+          console.log("admin login true");
+          response.admin = admin;
+          response.status = true;
+          resolve(response);
+        } else {
+          console.log("login error");
+          reject({ status: false,msg: "Your password is incorrect" });
+        }
+      });
+    } else {
+      console.log("Login Failed");
+      reject({ status: false,msg: "Your username is incorrect" });
+    }
+  });
 },
 
 

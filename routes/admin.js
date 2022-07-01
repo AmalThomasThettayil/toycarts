@@ -1,26 +1,52 @@
 const express = require("express");
 const router = express.Router();
 const adminHelpers = require("../helpers/adminHelpers");
-const user = require("../models/user");
-const Product = require("../models/product");
-const async = require("hbs/lib/async");
-const { response } = require("express");
 const Storage = require("../middleware/multer");
 
-router.get("/", function (req, res, next) {
-  res.render("admin/adminLogin", { layout: false });
+const verifyLogin = (req, res, next) => { 
+  if (req.session.adminlogin) {
+    next();
+  } else {
+    res.redirect("/admin");
+  }
+};
+
+router.get("/", function (req, res, next) { 
+  res.render("admin/adminLogin", { 
+    logErr:req.session.adminloggErr,
+     layout: false
+     });
+  req.session.adminloggErr = null
 });
 
 router.post("/adminLogin", function (req, res, next) {
-  res.redirect("/admin/adminDash",{ layout: false, adminvalue });
-});
 
-router.get("/adminDash", function (req, res, next) {
+    adminHelpers
+      .doAdminLogin(req.body)
+      .then((response) => {       
+        req.session.adminlogin = true;
+        req.session.admin = response.admin;       
+        res.redirect("/admin/adminDash");
+      })
+      .catch((err) => {
+        req.session.adminloggErr = err.msg;
+        res.redirect("/admin");
+      });
+  });
+
+ 
+router.get("/adminDash",verifyLogin, function (req, res, next) {
+  console.log("inside adminDash+6666666666666666666666666666");
   let adminvalue = req.session.admin;
   res.render("admin/adminDash", { layout: false, adminvalue });
 });
+router.get("/adminLogout", function (req, res, next) {
+  res.redirect("/admin");
+  req.session.destroy();
+});
 
-router.get("/productManage", async function (req, res, next) {
+
+router.get("/productManage",verifyLogin, async function (req, res, next) {
   console.log("productsssssssss");
   const products = await adminHelpers.getAllProducts();
   console.log(products);
@@ -28,13 +54,13 @@ router.get("/productManage", async function (req, res, next) {
   res.render("admin/productManage", { products, layout: false });
 });
 
-router.get("/userManage", function (req, res, next) {
+router.get("/userManage",verifyLogin, function (req, res, next) {
   adminHelpers.getAllUsers().then((user) => {
     res.render("admin/userManage", { layout: false, user });
   });
 });
 
-router.get("/addbrands", async (req, res) => {
+router.get("/addbrands",verifyLogin, async (req, res) => {
   const categories = await adminHelpers.getAllCategory();
   console.log(categories);
   res.render("admin/addbrands", {
@@ -98,7 +124,7 @@ router.delete("/User/:id", function (req, res, next) {
   });
 });
 
-router.get("/addProducts", async (req, res) => {
+router.get("/addProducts",verifyLogin, async (req, res) => {
   const category = await adminHelpers.getAllCategory();
   const brandName = await adminHelpers.getBrands();
   const subcategory = await adminHelpers.getAllSubcategory();
@@ -135,7 +161,7 @@ router.post(
       });
   }
 );
-router.get("/deleteProduct/:id", (req, res) => {
+router.get("/deleteProduct/:id",verifyLogin, (req, res) => {
   console.log(req.params.id+'inside deleteeeeeeeeeeeeeeeeeeeeeeeeeeeee');
   const proId = req.params.id;
   adminHelpers.deleteProduct(proId).then((response) => {
@@ -144,7 +170,7 @@ router.get("/deleteProduct/:id", (req, res) => {
   });
   console.log(proId);
 });
-router.get("/editProduct/:id", async (req, res) => {
+router.get("/editProduct/:id",verifyLogin, async (req, res) => {
   let product = await adminHelpers.getProductDetails(req.params.id);
   console.log(product+'111111111111111111111111111111');
   const category = await adminHelpers.getAllCategory();
@@ -191,7 +217,7 @@ router.post("/editProduct/:id",
   }
 );
 
-router.get("/blockUser/:id", (req, res) => {
+router.get("/blockUser/:id",verifyLogin, (req, res) => {
   const proId = req.params.id; 
   console.log(proId);
   console.log("sdjfhusguasuashguahshasdgs");
@@ -199,14 +225,14 @@ router.get("/blockUser/:id", (req, res) => {
     res.json({status:true})
     });
 });
-router.get("/unBlockUser/:id", (req, res) => {
+router.get("/unBlockUser/:id",verifyLogin, (req, res) => {
   const proId = req.params.id;
   console.log("esfhusayfuahiuashahsfhasdu");
   adminHelpers.unBlockUser(proId).then((response) => {  
   });
 });
 
-router.get('/orders',(req,res)=>{
+router.get('/orders',verifyLogin,(req,res)=>{
   adminHelpers.allOrders().then((response)=>{
     const allOrders=response
     res.render('admin/orders',{allOrders,layout:false})
@@ -215,7 +241,7 @@ router.get('/orders',(req,res)=>{
 })
 
 
-router.get('/orderDetails/:id',(req,res)=>{
+router.get('/orderDetails/:id',verifyLogin,(req,res)=>{
   adminHelpers.orderDetails(req.params.id).then((response)=>{
     const order=response
     res.render('admin/orderDetails',{order,admin:true,layout:false})
