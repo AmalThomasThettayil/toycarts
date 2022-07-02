@@ -61,7 +61,7 @@ router.get("/userManage",verifyLogin, function (req, res, next) {
 router.get("/addbrands",verifyLogin, async (req, res) => {
   const categories = await adminHelpers.getAllCategory();
   console.log(categories);
-  res.render("admin/addbrands", {
+  res.render("admin/addBrands", {
     categories,
     layout: false,
     Err: req.session.loggE,
