@@ -45,7 +45,7 @@ router.get("/adminLogout", function (req, res, next) {
 
 
 router.get("/productManage",verifyLogin, async function (req, res, next) {
-  console.log("productsssssssss");
+
   const products = await adminHelpers.getAllProducts();
   console.log(products);
   // const alert=req.flash('msg')
@@ -102,7 +102,7 @@ router.post("/addCategory", (req, res) => {
 
 router.post("/addSubcategory", (req, res) => {
   console.log(req.body);
-  console.log("subcategory log");
+
   adminHelpers
     .addSubcategory(req.body)
     .then((response) => {
