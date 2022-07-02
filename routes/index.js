@@ -5,6 +5,7 @@ const user = require("../models/user");
 const adminHelpers = require("../helpers/adminHelpers");
 const products = require("../models/product");
 const { response } = require("express");
+let filterResult
 
 const verifyLogin = (req, res, next) => { 
   if (req.session.logedin) {
@@ -460,9 +461,72 @@ router.delete("/ProductFromWish", (req, res, next) => {
   });
 });
 
-router.get("/shop",(req,res)=>{
-  const allProducts = adminHelpers.getAllProducts()
-  res.render("user/category",{allProducts})
+// router.get("/shop",(req,res)=>{
+//   const allProducts = adminHelpers.getAllProducts()
+//   res.render("user/category",{allProducts})
+// })
+
+router.post('/search-filter', (req, res) => {
+  // console.log("gjhdukhjlsd;===================");
+  console.log(req.body);
+  let a = req.body
+  let price = parseInt(a.Prize)
+  let brandFilter =a.brand
+  let categoryFilter = a.category
+
+  // for (let i of a.brand) {
+  //   brandFilter.push({ 'brand': i })
+  // }
+  // for (let i of a.category) {
+  //   categoryFilter.push({ 'category': i })
+  // }
+  userHelpers.searchFilter(brandFilter, categoryFilter, price).then((result) => {
+    filterResult = result
+    // console.log("==============================================");
+// console.log(result);
+    res.json({ status: true })
+  })
+
+})
+
+router.post("/search", async (req, res) => {
+  // console.log("=============================================");
+  // console.log(req.body);
+  // console.log("[[[[[[[[");
+  let key = req.body.key;
+  // console.log(key);
+  userHelpers.getSearchProducts(key).then((response)=>{
+    // console.log(";;;;;;;;;;;;;;");
+    filterResult=response
+    res.redirect("/filterPage")
+// res.json(response)
+    // filterResult = response
+    // res.redirect('/filterPage')
+
+  })
+});
+
+router.get('/shop', (req, res) => {
+  userHelpers.allproducts().then(async (products) => {
+    filterResult = products
+    res.redirect('/filterPage')
+  })
+
+})
+
+router.get('/filterPage', async (req, res) => { 
+  let cartcount = ''
+  let user = req.session.user
+  if (user) {
+    cartcount=await userHelpers.getCartCount(req.session.user._id)
+// console.log(cartcount);
+  }
+  let category =await adminHelpers.getAllCategory();
+  let brands =await adminHelpers.getBrands()
+  // console.log(filterResult);
+  // console.log();
+  res.render('user/b', { filterResult, category, brands, cartcount, layout:false})
+
 })
 
 

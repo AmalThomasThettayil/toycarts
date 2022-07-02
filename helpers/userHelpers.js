@@ -571,5 +571,116 @@ module.exports = {
       })  
     })
   }, 
+
+
+  allproducts: () => {
+    return new Promise(async (resolve, reject) => {
+      const products = await productData.find({}).lean();
+      resolve(products);
+    });
+  },
+  filterbrands:(brandFilter)=>{
+    return new Promise(async(resolve,reject)=>{
+      let brandid=mongoose.Types.ObjectId(brandFilter);
+        result = await productData.aggregate([
+          {
+            $match:{Brand:brandid}
+            
+          },
+        ])
+      
+      resolve(result)  
+      
+    })
+
+  },
+  
+
+  searchFilter :(brandFilter,categoryFilter,price) => {
+    return new Promise(async (resolve, reject) => {
+        let result
+
+        if(brandFilter && categoryFilter  ){
+          let brandid=mongoose.Types.ObjectId(brandFilter);
+          let categoryid=mongoose.Types.ObjectId(categoryFilter)
+          // console.log(brandid);
+          // console.log(categoryid);
+             result = await productData.aggregate([
+                {
+                    $match:{brand:brandid}
+                    
+                },
+
+                {
+                    $match:{ category:categoryid}
+                    
+                },
+                {
+                    $match:{ price:{$lt:price}}
+                }
+            ])
+            // console.log("1");
+        } 
+
+        else if(brandFilter  ){
+          let brandid=mongoose.Types.ObjectId(brandFilter);
+            result = await productData.aggregate([
+              {
+                $match:{brand:brandid}
+                
+              },
+              {
+                $match:{ price:{$lt:price}}
+              }
+            ])
+            // console.log("2");
+            // console.log(result);
+            
+          }
+          else if(categoryFilter){
+            let categoryid=mongoose.Types.ObjectId(categoryFilter)
+        result = await productData.aggregate([
+          
+           
+            {  
+                $match:{category:categoryid}
+                
+            },
+            {
+                $match:{price:{$lt:price}}
+            }
+        ])
+        // console.log("3");
+      }
+    
+        else{
+             result = await productData.aggregate([
+                
+                {
+                    $match:{price:{$lt:price}}
+                }
+            ])
+            // console.log("4");
+        }
+        resolve(result)
+    })
+  },
+
+  getSearchProducts:(key)=>{
+    console.log(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;");
+    return new Promise(async(resolve,reject)=>{
+      const products=await productData.find({
+        $or: [
+          { productName: { $regex: new RegExp("^" + key + ".*", "i") } },
+          // { Brand: { $regex: new RegExp("^" + key + ".*", "i") } },
+          // { Category: { $regex: new RegExp("^" + key + ".*", "i") } },
+        ],
+      }).lean()
+      console.log("====================");
+      console.log(products);
+        resolve(products)
+    })
+  },
+
 };
 

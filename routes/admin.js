@@ -35,10 +35,8 @@ router.post("/adminLogin", function (req, res, next) {
   });
 
  
-router.get("/adminDash",verifyLogin, function (req, res, next) {
-  console.log("inside adminDash+6666666666666666666666666666");
-  let adminvalue = req.session.admin;
-  res.render("admin/adminDash", { layout: false, adminvalue });
+router.get("/adminDash",verifyLogin, function (req, res, next) { 
+  res.render("admin/adminDash", { layout: false});
 });
 router.get("/adminLogout", function (req, res, next) {
   res.redirect("/admin");
